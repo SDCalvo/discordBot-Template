@@ -11,16 +11,24 @@ export async function lolApi(msg: Discord.Message) {
   //get summoner profile
   const resSummoner = await axiosLoL.get(`lol/summoner/v4/summoners/by-name/${summoner}`);
   //get account ID
-  const { accountId } = resSummoner.data;
-  console.log("🚀 - lolApi - accountId", accountId);
+  const { puuid } = resSummoner.data;
+  console.log("🚀 - lolApi - puuid", puuid);
   //Set ammount of games returned
   const params = { endIndex: 1 }
   //get match history
-  const resMatchs = await axiosLoL.get(`/lol/match/v4/matchlists/by-account/${accountId}`, { params });
-  // console.log("🚀 - lolApi - data", resMatchs.data);
-  console.log(new Date(resMatchs.data.matches[0].timestamp));
+  const resMatchs = await axiosLoL.get(`https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=0&count=20`);
+  console.log("🚀 - lolApi - data", resMatchs.data);
   //get game ID from matches
-  const { gameId } = resMatchs.data.matches[0];
+  const lastMatch = resMatchs.data[0];
+  //get game info from match ID
+  const gameInfo = await axiosLoL.get(`https://americas.api.riotgames.com/lol/match/v5/matches/${lastMatch}`);
+  //construct msg for Disc
+
   //Send response to Discord
-  msg.channel.send(JSON.stringify(resMatchs.data));
+  msg.channel.send(JSON.stringify(lastMatch));
+}
+
+function constructMsg(msg: any){
+
+  
 }
