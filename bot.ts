@@ -1,7 +1,7 @@
 require('dotenv').config();
 import axios from 'axios';
 import Discord from 'discord.js';
-import { randomIndex } from './helper';
+import { runCommand, checkPrefix, randomIndex } from './helper';
 import { lolApi } from './lolService';
 
 const client = new Discord.Client();
@@ -20,42 +20,43 @@ const replies = [
   'chango deja que me diviedta',
 ];
 
+const commandsKeys = [
+  { label: 'damian porque te armas mal?', func: damian },
+  { label: 'lolApi ', func: lolApi },
+  { label: 'gif ', func: getGif },
+];
+
 async function gotMessage(msg: Discord.Message) {
   try {
-    if (!msg.content.includes('!l ')) return;
-    msg.content = msg.content.slice(3);
 
-    console.log(msg.content);
-    await lolApi(msg);
-    await getGif(msg);
-    leeroy(msg);
+    //console.log(msg.content);
+    let command = checkPrefix(msg, '!l ');
+    if (command) {
+      runCommand(msg, commandsKeys);
+    };
+
   } catch (error: any) {
-    console.log(`Guarda! `, error?.response.data);
-    console.log(`Guarda! `, error);
+    console.log(`Guarda! `, error?.response.data || error);
   }
 }
 
-function leeroy(msg: Discord.Message) {
-  if (msg.content === 'damian armate bien') {
-    const index = randomIndex(replies.length);
-    msg.channel.send(replies[index]);
-  }
+function damian(msg: Discord.Message) {
+  const index = randomIndex(replies.length);
+  msg.channel.send(replies[index]);
 }
 
 async function getGif(msg: Discord.Message) {
-  if (msg.content.includes('gif')) {
-    msg.content = msg.content.slice(4);
-    console.log('🚀 - msg.content', msg.content);
-    const limit = 100;
-    //msg.content dosen't have what slice method got rid of
-    const URL = `https://g.tenor.com/v1/search`;
-    const params = {
-      limit,
-      key: process.env.TENORKEY,
-      q: msg.content,
-    };
-    let response = await axios.get(URL, { params });
-    const rIndex = randomIndex(response.data.results.length);
-    msg.channel.send(response.data.results[rIndex].url);
-  }
+  const term = msg.content;
+  console.log("🚀 - term", term);
+  const limit = 100;
+  //term dosen't have what slice method got rid of
+  const URL = `https://g.tenor.com/v1/search`;
+  const params = {
+    limit,
+    key: process.env.TENORKEY,
+    q: term,
+  };
+  let response = await axios.get(URL, { params });
+  const rIndex = randomIndex(response.data.results.length);
+  msg.channel.send(response.data.results[rIndex].url);
 }
