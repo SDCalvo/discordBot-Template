@@ -1,7 +1,7 @@
 {
-    "tabWidth": 4,
-    "singleQuote": true,
-    "bracketSpacing": true,
-    "printWidth": 110,
-    "endOfLine": "crlf"
+  "tabWidth": 2,
+  "singleQuote": true,
+  "bracketSpacing": true,
+  "printWidth": 110,
+  "endOfLine": "crlf"
 }
